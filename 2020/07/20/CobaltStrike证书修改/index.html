@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>CobaltStrike证书修改 | drinkwater&#39;s Blog</title>
+  <meta name="description" content="为什么要修改？1、CS的客户端和服务端通过ssl进行加密通讯，默认的证书配置文件导致很容易被各类检测设备识别。 ![image-20200911111438973](&#x2F;Users&#x2F;zhangyan03&#x2F;Library&#x2F;Application Support&#x2F;typora-user-images&#x2F;image-20200911111438973.png)   2、除了修改如上所说的ssl证书外，cs中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CobaltStrike证书修改">
+<meta property="og:url" content="https://www.urso.dog/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/index.html">
+<meta property="og:site_name" content="dr1nkw4ter&#39;s Blog">
+<meta property="og:description" content="为什么要修改？1、CS的客户端和服务端通过ssl进行加密通讯，默认的证书配置文件导致很容易被各类检测设备识别。 ![image-20200911111438973](&#x2F;Users&#x2F;zhangyan03&#x2F;Library&#x2F;Application Support&#x2F;typora-user-images&#x2F;image-20200911111438973.png)   2、除了修改如上所说的ssl证书外，cs中">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.urso.dog/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/Snipaste_2020-09-11_11-15-19.png">
+<meta property="og:image" content="https://www.urso.dog/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/Snipaste_2020-09-11_11-27-09.png">
+<meta property="og:image" content="https://www.urso.dog/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/Snipaste_2020-09-11_11-29-35.png">
+<meta property="article:published_time" content="2020-07-20T02:43:24.000Z">
+<meta property="article:modified_time" content="2020-09-17T02:58:18.086Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="工具">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.urso.dog/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/Snipaste_2020-09-11_11-15-19.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://www.urso.dog/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="dr1nkw4ter&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/touxiang.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/dr1nkw4ter" target="_blank">
+          <img class="img-circle img-rotate" src="/images/touxiang.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">drinkwater</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">网络安全从业者</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Beijing, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" rel="tag">代码执行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" rel="tag">命令执行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" style="font-size: 13px;">代码执行</a> <a href="/tags/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" style="font-size: 13px;">命令执行</a> <a href="/tags/%E5%B7%A5%E5%85%B7/" style="font-size: 13px;">工具</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/" class="title">CobaltStrike证书修改</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-07-20T02:43:24.000Z" itemprop="datePublished">2020-07-20</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/07/07/SXF-vpn%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" class="title">SXF-vpn远程命令执行</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-07-07T08:41:36.000Z" itemprop="datePublished">2020-07-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/07/07/Big-ip%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C-%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/" class="title">Big-ip远程代码执行&amp;本地文件读取</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-07-07T04:23:41.000Z" itemprop="datePublished">2020-07-07</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-CobaltStrike证书修改" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      CobaltStrike证书修改
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/" class="article-date">
+	  <time datetime="2020-07-20T02:43:24.000Z" itemprop="datePublished">2020-07-20</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 814(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 4(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="为什么要修改？"><a href="#为什么要修改？" class="headerlink" title="为什么要修改？"></a>为什么要修改？</h2><p>1、CS的客户端和服务端通过ssl进行加密通讯，默认的证书配置文件导致很容易被各类检测设备识别。</p>
+<p>![image-20200911111438973](/Users/zhangyan03/Library/Application Support/typora-user-images/image-20200911111438973.png)</p>
+<img src="/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/Snipaste_2020-09-11_11-15-19.png" class="" title="This is an image">
+
+<p>2、除了修改如上所说的ssl证书外，cs中使用https上线有独立的证书，这个证书也需要修改用来防止被识别。</p>
+<h2 id="修改方法"><a href="#修改方法" class="headerlink" title="修改方法"></a>修改方法</h2><h5 id="ssl加密证书"><a href="#ssl加密证书" class="headerlink" title="ssl加密证书"></a>ssl加密证书</h5><p>创建服务端证书文件:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#96;keytool -keystore .&#x2F;cobaltstrike.store -storepass 123456 -keypass 123456 -genkey -keyalg RSA -alias test -dname &quot;CN&#x3D;(名字与姓氏), OU&#x3D;(组织单位名称), O&#x3D;(组织名称), L&#x3D;(城市或区域名称), ST&#x3D;(州或省份名称), C&#x3D;(单位的两字母国家代码)&quot;&#96;</span><br></pre></td></tr></table></figure>
+
+<p>以下命令进行导入:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore .&#x2F;cobaltstrike.store -destkeystore .&#x2F;cobaltstrike.store -deststoretype pkcs12</span><br></pre></td></tr></table></figure>
+
+<p>查看证书文件:</p>
+<img src="/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/Snipaste_2020-09-11_11-27-09.png" class="" title="This is an image">
+
+<p>修改teamserver文件，端口建议一并修改：</p>
+<img src="/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/Snipaste_2020-09-11_11-29-35.png" class="" title="This is an image">
+
+<p><strong>cobaltstrike.jar 中文件创建</strong></p>
+<p>放到cobaltstrike.jar/resources/</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">keytool -keystore .&#x2F;ssl.store -storepass newlife@2020 -keypass newlife@2020 -genkey -keyalg RSA -alias whoami -dname &quot;CN&#x3D;Jhon, OU&#x3D;hjnjh, O&#x3D;Chrome, L&#x3D;Somewhere, S&#x3D;Cyberspace, C&#x3D;Earth&quot; </span><br><span class="line"></span><br><span class="line">keytool -keystore .&#x2F;proxy.store -storepass newlife@2020 -keypass newlife@2020 -genkey -keyalg RSA -alias whoami -dname &quot;CN&#x3D;Jhon, OU&#x3D;hjnjh, O&#x3D;Chrome, L&#x3D;Somewhere, S&#x3D;Cyberspace, C&#x3D;Earth&quot;</span><br></pre></td></tr></table></figure>
+
+<h5 id="https上线使用的证书"><a href="#https上线使用的证书" class="headerlink" title="https上线使用的证书"></a>https上线使用的证书</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">set sample_name &quot;tryblog POS Malware&quot;;</span><br><span class="line">set sleeptime &quot;5000&quot;; # use a ~30s delay between callbacks</span><br><span class="line">set jitter    &quot;10&quot;;    # throw in a 10% jitter</span><br><span class="line">set useragent &quot;Mozilla&#x2F;5.0 (Windows NT 6.1; rv:24.0) Gecko&#x2F;20100101 Firefox&#x2F;24.0&quot;;</span><br><span class="line"> </span><br><span class="line">#设置证书，注意以下内容得和你之前生成的证书一样：CN&#x3D;Jhon, OU&#x3D;Advanced, O&#x3D;Chrome, L&#x3D;Somewhere, S&#x3D;Cyberspace, C&#x3D;Earth</span><br><span class="line">https-certificate &#123;</span><br><span class="line">    set CN       &quot;Jhon&quot;; </span><br><span class="line">    set O        &quot;Chrome&quot;;   </span><br><span class="line">    set C        &quot;Earth&quot;;</span><br><span class="line">    set L        &quot;Somewhere&quot;;</span><br><span class="line">    set OU       &quot;Advanced&quot;;  </span><br><span class="line">    set ST       &quot;Cyberspace&quot;;</span><br><span class="line">    set validity &quot;365&quot;;</span><br><span class="line">&#125;</span><br><span class="line">#设置，修改成你的证书名称和证书密码：CN&#x3D;Jhon, OU&#x3D;Advanced, O&#x3D;Chrome, L&#x3D;Somewhere, S&#x3D;Cyberspace, C&#x3D;Earth</span><br><span class="line">code-signer&#123;</span><br><span class="line">    set keystore &quot;cobaltstrike.store&quot;;</span><br><span class="line">    set password &quot;123456&quot;;</span><br><span class="line">    set alias &quot;test&quot;;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">#指定DNS beacon不用的时候指定到IP地址</span><br><span class="line">set dns_idle &quot;8.8.4.4&quot;;</span><br><span class="line"> </span><br><span class="line">#每个单独DNS请求前强制睡眠时间</span><br><span class="line">set dns_sleep &quot;0&quot;;</span><br><span class="line"> </span><br><span class="line">#通过DNS上载数据时主机名的最大长度[0-255]</span><br><span class="line">set maxdns    &quot;235&quot;;</span><br><span class="line"> </span><br><span class="line">http-post &#123;</span><br><span class="line">    set uri &quot;&#x2F;windebug&#x2F;updcheck.php &#x2F;aircanada&#x2F;dark.php &#x2F;aero2&#x2F;fly.php &#x2F;windowsxp&#x2F;updcheck.php &#x2F;hello&#x2F;flash.php&quot;;</span><br><span class="line"> </span><br><span class="line">    client &#123;</span><br><span class="line">        header &quot;Accept&quot; &quot;text&#x2F;plain&quot;;</span><br><span class="line">        header &quot;Accept-Language&quot; &quot;en-us&quot;;</span><br><span class="line">        header &quot;Accept-Encoding&quot; &quot;text&#x2F;plain&quot;;</span><br><span class="line">        header &quot;Content-Type&quot; &quot;application&#x2F;x-www-form-urltrytryd&quot;;</span><br><span class="line"> </span><br><span class="line">        id &#123;</span><br><span class="line">            netbios;</span><br><span class="line">            parameter &quot;id&quot;;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        output &#123;</span><br><span class="line">            base64;</span><br><span class="line">            prepend &quot;&amp;op&#x3D;1&amp;id&#x3D;vxeykS&amp;ui&#x3D;Josh @ PC&amp;wv&#x3D;11&amp;gr&#x3D;backoff&amp;bv&#x3D;1.55&amp;data&#x3D;&quot;;</span><br><span class="line">            print;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    server &#123;</span><br><span class="line">        output &#123;</span><br><span class="line">            print;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">http-get &#123;</span><br><span class="line">    set uri &quot;&#x2F;updates&quot;;</span><br><span class="line"> </span><br><span class="line">    client &#123;</span><br><span class="line">        metadata &#123;</span><br><span class="line">            netbiosu;</span><br><span class="line">            prepend &quot;user&#x3D;&quot;;</span><br><span class="line">            header &quot;Cookie&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    server &#123;</span><br><span class="line">        header &quot;Content-Type&quot; &quot;text&#x2F;plain&quot;;</span><br><span class="line"> </span><br><span class="line">        output &#123;</span><br><span class="line">            base64;</span><br><span class="line">            print;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入cs文件夹，将刚刚生成的证书，和创建的c2.profile文件复制进去。</p>
+<figure class="highlight plain"><figcaption><span>C2.profile  ```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#### 启动teamserver</span><br><span class="line"></span><br><span class="line">&#96;&#96;&#96;nohup .&#x2F;teamserver 1.1.2.3 123456 .&#x2F;C2.profile &amp;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1、<a href="https://mp.weixin.qq.com/s/5MWDXN3eCaw9m-XHDGaXcQ" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/5MWDXN3eCaw9m-XHDGaXcQ</a></p>
+<p>2、<a href="https://blog.csdn.net/shuteer_xu/article/details/106435793" target="_blank" rel="noopener">https://blog.csdn.net/shuteer_xu/article/details/106435793</a></p>
+<p>3、<a href="https://blog.csdn.net/qq_41874930/article/details/107791606" target="_blank" rel="noopener">https://blog.csdn.net/qq_41874930/article/details/107791606</a></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://www.urso.dog/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/" title="CobaltStrike证书修改" target="_blank" rel="external">https://www.urso.dog/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/dr1nkw4ter" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/touxiang.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/dr1nkw4ter" target="_blank"><span class="text-dark">drinkwater</span><small class="ml-1x">网络安全从业者</small></a></h3>
+        <div>此博客用来记录 学习&amp;心情</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2020/07/07/SXF-vpn%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" title="SXF-vpn远程命令执行"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: 'wqstm518RyIxRcVy3a5aLLaa-gzGzoHsz',
+    appKey: 'o3re8I8juiiSR9LtyeHDK5Ji',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
