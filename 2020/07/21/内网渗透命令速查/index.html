@@ -18,15 +18,15 @@
   
   
   <title>内网渗透命令速查 | drinkwater&#39;s Blog</title>
-  <meta name="description" content="信息收集本机信息收集查看计划任务： 1schtasks &#x2F;query &#x2F;fo LIST &#x2F;V  查看安装软件信息： 12wmic product get name,versionpowershell &quot;Get-WmiObject -class Win32_Product |Select-Object -Property name,version  查看本机器">
+  <meta name="description" content="信息收集本机信息收集查看计划任务：1schtasks &#x2F;query &#x2F;fo LIST &#x2F;V  查看安装软件信息：12wmic product get name,versionpowershell &quot;Get-WmiObject -class Win32_Product |Select-Object -Property name,version  查看本机器服务">
 <meta property="og:type" content="article">
 <meta property="og:title" content="内网渗透命令速查">
 <meta property="og:url" content="https://www.urso.dog/2020/07/21/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F%E5%91%BD%E4%BB%A4%E9%80%9F%E6%9F%A5/index.html">
 <meta property="og:site_name" content="dr1nkw4ter&#39;s Blog">
-<meta property="og:description" content="信息收集本机信息收集查看计划任务： 1schtasks &#x2F;query &#x2F;fo LIST &#x2F;V  查看安装软件信息： 12wmic product get name,versionpowershell &quot;Get-WmiObject -class Win32_Product |Select-Object -Property name,version  查看本机器">
+<meta property="og:description" content="信息收集本机信息收集查看计划任务：1schtasks &#x2F;query &#x2F;fo LIST &#x2F;V  查看安装软件信息：12wmic product get name,versionpowershell &quot;Get-WmiObject -class Win32_Product |Select-Object -Property name,version  查看本机器服务">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-07-21T12:06:17.000Z">
-<meta property="article:modified_time" content="2020-09-23T16:09:08.580Z">
+<meta property="article:modified_time" content="2020-09-25T06:35:27.065Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="信息收集">
 <meta name="twitter:card" content="summary">
@@ -315,7 +315,7 @@
   <div class="slimContent">
     <nav id="toc" class="article-toc">
       <h3 class="toc-title">文章目录</h3>
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#信息收集"><span class="toc-number">1.</span> <span class="toc-text">信息收集</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#本机信息收集"><span class="toc-number">1.1.</span> <span class="toc-text">本机信息收集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#域内信息收集"><span class="toc-number">1.2.</span> <span class="toc-text">域内信息收集</span></a></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#信息收集"><span class="toc-number">1.</span> <span class="toc-text">信息收集</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#本机信息收集"><span class="toc-number">1.1.</span> <span class="toc-text">本机信息收集</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#查看计划任务："><span class="toc-number">1.1.0.0.1.</span> <span class="toc-text">查看计划任务：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看安装软件信息："><span class="toc-number">1.1.0.0.2.</span> <span class="toc-text">查看安装软件信息：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看本机器服务："><span class="toc-number">1.1.0.0.3.</span> <span class="toc-text">查看本机器服务：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看进程："><span class="toc-number">1.1.0.0.4.</span> <span class="toc-text">查看进程：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#当前在线用户："><span class="toc-number">1.1.0.0.5.</span> <span class="toc-text">当前在线用户：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看开机启动程序信息-："><span class="toc-number">1.1.0.0.6.</span> <span class="toc-text">查看开机启动程序信息 ：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#开机时间："><span class="toc-number">1.1.0.0.7.</span> <span class="toc-text">开机时间：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#管理员权限-与本机连接的客户端会话："><span class="toc-number">1.1.0.0.8.</span> <span class="toc-text">(管理员权限)与本机连接的客户端会话：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查询补丁："><span class="toc-number">1.1.0.0.9.</span> <span class="toc-text">查询补丁：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看防火墙配置："><span class="toc-number">1.1.0.0.10.</span> <span class="toc-text">查看防火墙配置：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#修改防火墙："><span class="toc-number">1.1.0.0.11.</span> <span class="toc-text">修改防火墙：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#关闭防火墙："><span class="toc-number">1.1.0.0.12.</span> <span class="toc-text">关闭防火墙：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看远程连接端口："><span class="toc-number">1.1.0.0.13.</span> <span class="toc-text">查看远程连接端口：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#开启远程连接："><span class="toc-number">1.1.0.0.14.</span> <span class="toc-text">开启远程连接：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#查看代理设置情况："><span class="toc-number">1.1.0.0.15.</span> <span class="toc-text">查看代理设置情况：</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#域内信息收集"><span class="toc-number">1.2.</span> <span class="toc-text">域内信息收集</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#是否为域环境"><span class="toc-number">1.2.0.0.1.</span> <span class="toc-text">是否为域环境</span></a></li></ol></li></ol></li></ol></li></ol></li></ol>
     </nav>
   </div>
 </aside>
@@ -366,7 +366,7 @@
         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/07/21/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F%E5%91%BD%E4%BB%A4%E9%80%9F%E6%9F%A5/#comments" class="article-comment-link">评论</a></span>
         
 	
-		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 405(字)</span>
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 478(字)</span>
 	
 	
 		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 2(分)</span>
@@ -376,52 +376,42 @@
     </div>
     <div class="article-entry marked-body" itemprop="articleBody">
       
-        <h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="本机信息收集"><a href="#本机信息收集" class="headerlink" title="本机信息收集"></a>本机信息收集</h3><p>查看计划任务：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">schtasks &#x2F;query &#x2F;fo LIST &#x2F;V</span><br></pre></td></tr></table></figure>
+        <h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="本机信息收集"><a href="#本机信息收集" class="headerlink" title="本机信息收集"></a>本机信息收集</h3><h6 id="查看计划任务："><a href="#查看计划任务：" class="headerlink" title="查看计划任务："></a>查看计划任务：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">schtasks &#x2F;query &#x2F;fo LIST &#x2F;V</span><br></pre></td></tr></table></figure>
 
-<p>查看安装软件信息：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wmic product get name,version</span><br><span class="line">powershell &quot;Get-WmiObject -class Win32_Product |Select-Object -Property name,version</span><br></pre></td></tr></table></figure>
+<h6 id="查看安装软件信息："><a href="#查看安装软件信息：" class="headerlink" title="查看安装软件信息："></a>查看安装软件信息：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wmic product get name,version</span><br><span class="line">powershell &quot;Get-WmiObject -class Win32_Product |Select-Object -Property name,version</span><br></pre></td></tr></table></figure>
 
-<p>查看本机器服务：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic service list brief</span><br></pre></td></tr></table></figure>
+<h6 id="查看本机器服务："><a href="#查看本机器服务：" class="headerlink" title="查看本机器服务："></a>查看本机器服务：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic service list brief</span><br></pre></td></tr></table></figure>
 
-<p>查看进程：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tasklist &#x2F;v</span><br><span class="line">wmic process list brief</span><br></pre></td></tr></table></figure>
+<h6 id="查看进程："><a href="#查看进程：" class="headerlink" title="查看进程："></a>查看进程：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tasklist &#x2F;v</span><br><span class="line">wmic process list brief</span><br></pre></td></tr></table></figure>
 
-<p>当前在线用户：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">query user || qwinsta</span><br></pre></td></tr></table></figure>
+<h6 id="当前在线用户："><a href="#当前在线用户：" class="headerlink" title="当前在线用户："></a>当前在线用户：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">query user || qwinsta</span><br></pre></td></tr></table></figure>
 
-<p>查看开机启动程序信息 ：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic startup get command,caption</span><br></pre></td></tr></table></figure>
+<h6 id="查看开机启动程序信息-："><a href="#查看开机启动程序信息-：" class="headerlink" title="查看开机启动程序信息 ："></a>查看开机启动程序信息 ：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic startup get command,caption</span><br></pre></td></tr></table></figure>
 
-<p>开机时间：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net statistics workstation</span><br></pre></td></tr></table></figure>
+<h6 id="开机时间："><a href="#开机时间：" class="headerlink" title="开机时间："></a>开机时间：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net statistics workstation</span><br></pre></td></tr></table></figure>
 
-<p>(管理员权限)与本机连接的客户端会话：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net session</span><br></pre></td></tr></table></figure>
+<h6 id="管理员权限-与本机连接的客户端会话："><a href="#管理员权限-与本机连接的客户端会话：" class="headerlink" title="(管理员权限)与本机连接的客户端会话："></a>(管理员权限)与本机连接的客户端会话：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net session</span><br></pre></td></tr></table></figure>
 
-<p>查询补丁：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systeminfo</span><br><span class="line">wmic qfe get Caption,Description,HotFixID,InstalledOn</span><br></pre></td></tr></table></figure>
+<h6 id="查询补丁："><a href="#查询补丁：" class="headerlink" title="查询补丁："></a>查询补丁：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systeminfo</span><br><span class="line">wmic qfe get Caption,Description,HotFixID,InstalledOn</span><br></pre></td></tr></table></figure>
 
-<p>查看防火墙配置：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netsh fifirewall show config</span><br></pre></td></tr></table></figure>
+<h6 id="查看防火墙配置："><a href="#查看防火墙配置：" class="headerlink" title="查看防火墙配置："></a>查看防火墙配置：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netsh fifirewall show config</span><br></pre></td></tr></table></figure>
 
-<p>修改防火墙：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">netsh advfirewall firewall 【命令】 rule 【其他参数】&#x2F;&#x2F;dir&#x3D;out为出站，in为入站，name&#x3D;all为全部</span><br><span class="line">netsh advfirewall firewall add rule name&#x3D;&quot;pass nc&quot; dir&#x3D;in action&#x3D;allow program&#x3D;&quot;C:\nc.exe&quot; &#x2F;&#x2F;2003以下</span><br><span class="line">netsh advfirewall firewall add rule name&#x3D;&quot;Remote 3389&quot; protocol&#x3D;TCP dir&#x3D;in localport&#x3D;3389 action&#x3D;allow &#x2F;&#x2F;2003以上（管理员）</span><br></pre></td></tr></table></figure>
+<h6 id="修改防火墙："><a href="#修改防火墙：" class="headerlink" title="修改防火墙："></a>修改防火墙：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">netsh advfirewall firewall 【命令】 rule 【其他参数】&#x2F;&#x2F;dir&#x3D;out为出站，in为入站，name&#x3D;all为全部</span><br><span class="line">netsh advfirewall firewall add rule name&#x3D;&quot;pass nc&quot; dir&#x3D;in action&#x3D;allow program&#x3D;&quot;C:\nc.exe&quot; &#x2F;&#x2F;2003以下</span><br><span class="line">netsh advfirewall firewall add rule name&#x3D;&quot;Remote 3389&quot; protocol&#x3D;TCP dir&#x3D;in localport&#x3D;3389 action&#x3D;allow &#x2F;&#x2F;2003以上（管理员）</span><br></pre></td></tr></table></figure>
 
-<p>关闭防火墙：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">netsh firewall set opmode disable   &#x2F;&#x2F;2003以下</span><br><span class="line">netsh advfirewall set allprofiles state off  &#x2F;&#x2F;2003以上（管理员）</span><br></pre></td></tr></table></figure>
+<h6 id="关闭防火墙："><a href="#关闭防火墙：" class="headerlink" title="关闭防火墙："></a>关闭防火墙：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">netsh firewall set opmode disable   &#x2F;&#x2F;2003以下</span><br><span class="line">netsh advfirewall set allprofiles state off  &#x2F;&#x2F;2003以上（管理员）</span><br></pre></td></tr></table></figure>
 
-<p>查看远程连接端口：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REG QUERY &quot;HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp&quot; &#x2F;V PortNumber &#x2F;&#x2F;0xd3d代表3389</span><br></pre></td></tr></table></figure>
+<h6 id="查看远程连接端口："><a href="#查看远程连接端口：" class="headerlink" title="查看远程连接端口："></a>查看远程连接端口：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REG QUERY &quot;HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp&quot; &#x2F;V PortNumber &#x2F;&#x2F;0xd3d代表3389</span><br></pre></td></tr></table></figure>
 
-<p>开启远程连接：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wmic path win32_terminalservicesetting where (__CLASS !&#x3D;&quot;&quot;) call setallowtsconnections 1 &#x2F;&#x2F;2003以下</span><br><span class="line">------------------2003以上，需要管理员权限</span><br><span class="line">wmic &#x2F;namespace:\\root\cimv2\terminalservices path win32_terminalservicesetting where (__CLASS !&#x3D;&quot;&quot;) call setallowtsconnections 1 </span><br><span class="line">wmic &#x2F;namespace:\\root\cimv2\terminalservices path win32_tsgeneralsetting where (TerminalName&#x3D;&#39;RDP-Tcp&#39;) call setuserauthenticationrequired 1 </span><br><span class="line">REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Terminal&quot; &quot;Server &#x2F;v fDenyTSConnections &#x2F;t REG_DWORD &#x2F;d 0 &#x2F;f    &#x2F;&#x2F;0开，1关</span><br></pre></td></tr></table></figure>
+<h6 id="开启远程连接："><a href="#开启远程连接：" class="headerlink" title="开启远程连接："></a>开启远程连接：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wmic path win32_terminalservicesetting where (__CLASS !&#x3D;&quot;&quot;) call setallowtsconnections 1 &#x2F;&#x2F;2003以下</span><br><span class="line">------------------2003以上，需要管理员权限</span><br><span class="line">wmic &#x2F;namespace:\\root\cimv2\terminalservices path win32_terminalservicesetting where (__CLASS !&#x3D;&quot;&quot;) call setallowtsconnections 1 </span><br><span class="line">wmic &#x2F;namespace:\\root\cimv2\terminalservices path win32_tsgeneralsetting where (TerminalName&#x3D;&#39;RDP-Tcp&#39;) call setuserauthenticationrequired 1 </span><br><span class="line">REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Terminal&quot; &quot;Server &#x2F;v fDenyTSConnections &#x2F;t REG_DWORD &#x2F;d 0 &#x2F;f    &#x2F;&#x2F;0开，1关</span><br></pre></td></tr></table></figure>
 
-<p>查看代理设置情况：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query &quot;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings&quot;</span><br></pre></td></tr></table></figure>
+<h6 id="查看代理设置情况："><a href="#查看代理设置情况：" class="headerlink" title="查看代理设置情况："></a>查看代理设置情况：</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query &quot;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings&quot;</span><br></pre></td></tr></table></figure>
 
-<h3 id="域内信息收集"><a href="#域内信息收集" class="headerlink" title="域内信息收集"></a>域内信息收集</h3>
+<h3 id="域内信息收集"><a href="#域内信息收集" class="headerlink" title="域内信息收集"></a>域内信息收集</h3><h6 id="是否为域环境"><a href="#是否为域环境" class="headerlink" title="是否为域环境"></a>是否为域环境</h6><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ipconfig &#x2F;all</span><br><span class="line">systeminfo</span><br><span class="line">net config workstation</span><br><span class="line">net time &#x2F;domain</span><br></pre></td></tr></table></figure>
+
+<p>查询域名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">net view</span><br><span class="line">1、键入不带参数的net view显示当前域的计算机列表。</span><br><span class="line">2、\\computername 指定要查看其共享资源的计算机。</span><br><span class="line">3、&#x2F;domain[domainname]指定要查看其可用计算机的域</span><br></pre></td></tr></table></figure>
+
+
       
     </div>
     <div class="article-footer">
