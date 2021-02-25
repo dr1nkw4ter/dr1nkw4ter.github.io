@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>NTLM认证及其利用点 | drinkwater&#39;s Blog</title>
+  <meta name="description" content="##NTLM认证在内网中的角色 微软采用 Kerberos 作为 Windows 2000及之后的活动目录域的默认认证协议。当某个服务器隶属于一个Windows AD域或者通过某种方式（如Linux到Windows AD的认证）与Windows  服务器域建立了信任关系的时候，通常采用Kerberos作为认证协议。但是无论你是否拥有活动目录域，NTLM都可以被采用。 拓展知识：Kerberos认证">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NTLM认证及其利用点">
+<meta property="og:url" content="https://www.urso.dog/2020/12/24/ntlm-relay/index.html">
+<meta property="og:site_name" content="dr1nkw4ter&#39;s Blog">
+<meta property="og:description" content="##NTLM认证在内网中的角色 微软采用 Kerberos 作为 Windows 2000及之后的活动目录域的默认认证协议。当某个服务器隶属于一个Windows AD域或者通过某种方式（如Linux到Windows AD的认证）与Windows  服务器域建立了信任关系的时候，通常采用Kerberos作为认证协议。但是无论你是否拥有活动目录域，NTLM都可以被采用。 拓展知识：Kerberos认证">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlmrenzheng.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/pth.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/pth1.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlm_relay.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/responder.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/netuse.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/gethash.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/hashcat0.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/hashcat.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlmv1.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlmv12.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/jiemiv1.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/crack.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/smbsign.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/xiugaiconfig.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlm-relay/offsmbhttp.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/dcrequest.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/relay.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/getpassword.png">
+<meta property="article:published_time" content="2020-12-24T09:19:09.000Z">
+<meta property="article:modified_time" content="2021-02-25T02:22:07.951Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="中间人">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlmrenzheng.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://www.urso.dog/2020/12/24/ntlm-relay/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="dr1nkw4ter&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/touxiang.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/dr1nkw4ter" target="_blank">
+          <img class="img-circle img-rotate" src="/images/touxiang.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">drinkwater</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">网络安全从业者</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Beijing, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">内网渗透</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a><span class="category-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%AD%E9%97%B4%E4%BA%BA/" rel="tag">中间人</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" rel="tag">代码执行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/" rel="tag">信息收集</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" rel="tag">命令执行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag">工具</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87/" rel="tag">权限提升</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/%E4%B8%AD%E9%97%B4%E4%BA%BA/" style="font-size: 13px;">中间人</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" style="font-size: 13px;">代码执行</a> <a href="/tags/%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/" style="font-size: 13px;">信息收集</a> <a href="/tags/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" style="font-size: 13px;">命令执行</a> <a href="/tags/%E5%B7%A5%E5%85%B7/" style="font-size: 13px;">工具</a> <a href="/tags/%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87/" style="font-size: 13px;">权限提升</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">九月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">内网渗透</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/12/24/ntlm-relay/" class="title">NTLM认证及其利用点</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-12-24T09:19:09.000Z" itemprop="datePublished">2020-12-24</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/09/17/NetLogon%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E-CVE-2020-1472/" class="title">NetLogon特权提升漏洞(CVE-2020-1472)</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-09-17T08:21:29.000Z" itemprop="datePublished">2020-09-17</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">内网渗透</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/07/21/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F%E5%91%BD%E4%BB%A4%E9%80%9F%E6%9F%A5/" class="title">内网渗透命令速查</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-07-21T12:06:17.000Z" itemprop="datePublished">2020-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/07/20/CobaltStrike%E8%AF%81%E4%B9%A6%E4%BF%AE%E6%94%B9/" class="title">CobaltStrike证书修改</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-07-20T02:43:24.000Z" itemprop="datePublished">2020-07-20</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/07/07/SXF-vpn%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" class="title">SXF-vpn远程命令执行</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-07-07T08:41:36.000Z" itemprop="datePublished">2020-07-07</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<aside class="sidebar sidebar-toc collapse in" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#NTLM认证过程"><span class="toc-number">1.</span> <span class="toc-text">NTLM认证过程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#破解net-ntlm-hash"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">破解net_ntlm hash</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考链接"><span class="toc-number">2.</span> <span class="toc-text">参考链接</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-ntlm-relay" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      NTLM认证及其利用点
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2020/12/24/ntlm-relay/" class="article-date">
+	  <time datetime="2020-12-24T09:19:09.000Z" itemprop="datePublished">2020-12-24</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">内网渗透</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/%E4%B8%AD%E9%97%B4%E4%BA%BA/" rel="tag">中间人</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/12/24/ntlm-relay/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 2.1k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 8(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>##NTLM认证在内网中的角色</p>
+<p>微软采用 Kerberos 作为 Windows 2000及之后的活动目录域的默认认证协议。当某个服务器隶属于一个Windows AD域或者通过某种方式（如Linux到Windows AD的认证）与Windows  服务器域建立了信任关系的时候，通常采用Kerberos作为认证协议。但是无论你是否拥有活动目录域，NTLM都可以被采用。</p>
+<p>拓展知识：Kerberos认证和NTLM认证都是基于<code>SSPI</code>（Security Support Provider Interface:Windows 定义的一套接口，此接口定义了与安全有关的功能函数， 用来进行身份验证、信息完整性验证、保护信息隐私等安全功能）实现的验证机制，即SSP(Security Support Provider)。NTLM SSP 是一种 Challenge/Response 验证机制。Kerberos SSP是基于 ticket 的身份验证机制。</p>
+<h2 id="NTLM认证过程"><a href="#NTLM认证过程" class="headerlink" title="NTLM认证过程"></a>NTLM认证过程</h2><p>NTLM Hash，在LM Hash算法被弃用后，NTLM Hash被用来进行Windows本地及网络认证的凭据，长度为32bit。</p>
+<p>例：    </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">admin -&gt; hex(16进制编码) &#x3D; 61646d696e </span><br><span class="line">61646d696e -&gt; Unicode &#x3D; 610064006d0069006e00 </span><br><span class="line">610064006d0069006e00 -&gt; MD4 &#x3D; 209c6174da490caeb422f3fa5a7ae634</span><br></pre></td></tr></table></figure>
+
+<p>当作为本地认证时，流程如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winlogon.exe（用户输入密码）-&gt; lsass.exe（接受用户输入的明文密码并将其加密为hash）-&gt; 然后与sam文件中的hash进行比较，相同通过。</span><br></pre></td></tr></table></figure>
+
+<p>作为网络认证时：</p>
+<p><img src="/2020/12/24/ntlm-relay/ntlmrenzheng.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1、客户端向服务端发起协商消息，包含客户端支持和向服务器请求的功能列表，包括用户名等。</span><br><span class="line">2、服务器对消息进行响应，包括服务器支持和同意的功能列表，重点包含服务器产生的Challenge。</span><br><span class="line">3、客户端接收到challenge之后，将用户hash与challenge进行加密运算得到response，将response,username,challenge发给服务器。</span><br><span class="line">4.1、服务器收到响应之后，使用challenge和用户hash进行加密得到response与发来的response进行比较，如果相同就会通过。（工作组场景）</span><br><span class="line">4.2、如果用户hash存储在域控里面，那么服务端没有用户hash，无法计算response进行验证。这个时候用户服务器就会通过netlogon协议联系域控，建立一个安全通道,然后将1、2、3全部发给域控(这个过程也叫作Pass Through Authentication认证流程)。</span><br><span class="line">5、域控使用challenge和用户hash进行加密得到response，与3中的response进行比较。</span><br></pre></td></tr></table></figure>
+
+<p>此处使用用户hash与challenge进行加密运算得到的response中包含有<code>net-ntlm hash</code>,根据NTLM v1响应和NTLMv2响应的区别分为Net-ntlm hash v1和Net-ntlm hash v2。两者加密算法不同，challenge位数不同：v1 challenge为8位、v2 challenge为16位。</p>
+<p>其中各版本windows默认发送的ntlm认证协议版本：</p>
+<ul>
+<li>Windows 2000 、 Windows XP: 发送 LM &amp; NTLM 响应</li>
+<li>Windows Server 2003: 仅发送 NTLM 响应</li>
+<li>Windows Vista、Windows Server 2008、Windows 7 以及 Windows Server 2008 R2及以上: 仅发送 NTLMv2 响应</li>
+</ul>
+<p>注：NTLM将自动以当前用户的账号和密码作为凭证来进行上面的操作，其认证方式有三种：</p>
+<p>1、不使用NTLM身份验证<br>2、先尝试NTLM身份验证,认证失败,再采用用户名和密码（默认方式）<br>3、仅使用NTLM身份验证</p>
+<p>###NTLM认证过程中带来的问题</p>
+<p>####PTH（hash传递）</p>
+<p>从认证过程来看，hash与challenge进行加密运算得到response是认证关键，而这个过程并没有密码明文的存在，也就是说我们使用hash就可以模拟用户登录。适用于没有明文，仅知道hash的场景。</p>
+<p>前提条件：用户名及对应ntlm hash。</p>
+<p>mimikatz：</p>
+<p>目标不是域用户而是本地用户时，domain跟主机名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mimikatz &quot;privilege::debug&quot; &quot;sekurlsa::pth&quot; &#x2F;user:win8 &#x2F;domain:study.com &#x2F;ntlm:74cd8298c79e17d6ca9d4ad7e8a75235</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/12/24/ntlm-relay/pth.png" alt></p>
+<p><img src="/2020/12/24/ntlm-relay/pth1.png" alt></p>
+<p>kb2871997</p>
+<p><strong>微软2014年5月13日发布了针对Pass The Hash的更新补丁kb2871997</strong>，但是对于本地Administrator(rid为500)和本地管理员组的域用户依旧能够进行hash 传递。</p>
+<p>原理：</p>
+<p>对于远程连接到Windows Vista +计算机的任何非RID 500本地管理员帐户，无论是通过WMI，PSEXEC还是其他方法(例外：RDP远程登录)，即使用户是本地管理员，返回的令牌都是已过滤的管理员令牌，即受到uac的限制。</p>
+<p>对于本地“管理员”组中的域用户帐户：当具有域用户帐户的用户远程登录Windows Vista计算机并且该用户是Administrators组的成员时，域用户将在远程计算机上以完全管理员访问令牌运行，并且该用户的UAC被禁用在该会话的远程计算机上。</p>
+<p>####NTLM RELAY</p>
+<p>ntlm relay的过程：</p>
+<p><img src="/2020/12/24/ntlm-relay/ntlm_relay.png" alt></p>
+<p>很明显就是一个中间人攻击的过程，但要明确ntlm是一个用来的作为认证的嵌入式协议，如果ntlm的上层协议是smb的情况下,ntlmrelay就是smb relay。那如果上层协议是http，我们也可以叫做http relay，但是统称为ntlm relay。</p>
+<p>如何在内网中触发ntlm请求：</p>
+<p>此篇文章已有详细的介绍：<a href="https://www.anquanke.com/post/id/193493#h2-6" target="_blank" rel="noopener">https://www.anquanke.com/post/id/193493#h2-6</a></p>
+<p>####NET_NTLM的利用</p>
+<h5 id="破解net-ntlm-hash"><a href="#破解net-ntlm-hash" class="headerlink" title="破解net_ntlm hash"></a>破解net_ntlm hash</h5><p>相关协议：LLMNR、NBNS、MDNS</p>
+<p>攻击机：192.168.31.1</p>
+<p>受害机：192.168.31.144</p>
+<p>使用responder建立监听，指定网卡</p>
+<p><img src="/2020/12/24/ntlm-relay/responder.png" alt></p>
+<p>在受害机器使用net use连接不存在的网络名</p>
+<p><img src="/2020/12/24/ntlm-relay/netuse.png" alt></p>
+<p>responder获得到net_ntlm hash，当Responder重复获取到同一个用户时不会再显示。</p>
+<p><img src="/2020/12/24/ntlm-relay/gethash.png" alt></p>
+<p>使用hashcat对hash进行破解</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hashcat64.exe -m 5600 hash .&#x2F;passwd.txt -o out.txt —-force</span><br></pre></td></tr></table></figure>
+
+<p>-m为加密类型，5600对应的就是NetNTLMv2</p>
+<p>-o为破解出的结果</p>
+<p>–force忽略警告</p>
+<p>passwd.dict为字典</p>
+<p><img src="/2020/12/24/ntlm-relay/hashcat0.png" alt></p>
+<p><img src="/2020/12/24/ntlm-relay/hashcat.png" alt></p>
+<p>成功破解出密码为1qaz@WSX。此处为Net-NTLM v2 hash，一般都是利用hashcat 爆破明文密码，取决于密码强度。如果是</p>
+<p>Net-NTLM v1 hash 理论上都可以还原为ntlm_hash。目前win server 2008及以后的windows版本默认均是使用NetNTLMv2的，默认使用NTLMv1的有2003、XP这些机器，如果想要降级到Net-NTLM v1，首先需要获得当前系统的管理员权限。</p>
+<p>将win7的v2降级为v1(管理员权限):</p>
+<p>1、临时降级：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa\ &#x2F;v lmcompatibilitylevel &#x2F;t REG_DWORD &#x2F;d 0 &#x2F;f</span><br></pre></td></tr></table></figure>
+
+<p>2、确保降级成功：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa\ &#x2F;v lmcompatibilitylevel &#x2F;t REG_DWORD &#x2F;d 2 &#x2F;f</span><br><span class="line">reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0\ &#x2F;v NtlmMinClientSec &#x2F;t REG_DWORD &#x2F;d 536870912 &#x2F;f</span><br><span class="line">reg add HKLM\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0\ &#x2F;v RestrictSendingNTLMTraffic &#x2F;t REG_DWORD &#x2F;d 0 &#x2F;f</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/12/24/ntlm-relay/ntlmv1.png" alt></p>
+<p><strong>此时开启responder要加上–lm参数(仅用于smb协议)</strong>，是为了获得指定ntlmv1加密方式下的hash，这种方式下的hash解密难度较小且可以免费解密。</p>
+<p><img src="/2020/12/24/ntlm-relay/ntlmv12.png" alt></p>
+<p>转化格式为<code>NTHASH:LMHASH</code>,上图为：<code>NTHASH:D58B7A9A242683185CB43B0116E2C676DBA74B7348D2DC6E</code></p>
+<p>至<a href="https://crack.sh/get-cracking/解密" target="_blank" rel="noopener">https://crack.sh/get-cracking/解密</a>:</p>
+<p><img src="/2020/12/24/ntlm-relay/jiemiv1.png" alt></p>
+<p>此时发生了尴尬的一幕：</p>
+<p><img src="/2020/12/24/ntlm-relay/crack.png" alt></p>
+<p>刚开始以为是我密码强度太高，但更换密码之后依旧如此，使用别人之前成功解密的v1hash也不能再次解密成功….(站点问题？)</p>
+<p>#####NTLM_RELAY</p>
+<p>当字典不够强大时，可以考虑不进行破解，转而进行中继。以smbrelay为例：被攻击机器不能开启SMB签名。默认不开启，但是在域中域控是默认开启的。所以在域中通常就是中继管理组成员到一些敏感的机器上。</p>
+<p>使用responder配套工具RunFinger检测是否开启smb签名：</p>
+<p><img src="/2020/12/24/ntlm-relay/smbsign.png" alt></p>
+<p>发现192.168.31.144未开启smb签名。</p>
+<p>######工作组</p>
+<p>在工作组当中只能够中继sid 500 administrator账户，成功的条件是被欺骗机器的administrator密码和被攻击主机的administrator密码相同！</p>
+<p>######域内：</p>
+<p>攻击机：192.168.31.1</p>
+<p>受害者机器：192.168.31.144</p>
+<p>域控：192.168.31.150</p>
+<p>首先关掉responder的SMB和HTTP服务器，否则端口占用会和Multi-relay之间产生一些冲突。修改</p>
+<p><img src="/2020/12/24/ntlm-relay/xiugaiconfig.png" alt></p>
+<p>开启responder：</p>
+<p><img src="./ntlm-relay/offsmbhttp.png" alt></p>
+<p>使用MultiRelay.py，-t为目标主机， -u ALL为relay任意用户的凭证，可以指定某一用户。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo python2 MultiRelay.py -t 192.168.31.144 -u ALL</span><br></pre></td></tr></table></figure>
+
+<p>在域控上发起ntlm请求，成功获取到目标主机权限</p>
+<p><img src="/2020/12/24/ntlm-relay/dcrequest.png" alt></p>
+<p><img src="/2020/12/24/ntlm-relay/relay.png" alt></p>
+<p>multirelay集成了mimikatz可以直接抓密码：</p>
+<p><img src="/2020/12/24/ntlm-relay/getpassword.png" alt></p>
+<p>​        域控或者域管理员组的成员的NET-NTLM  Hash 是可以进行中继攻击的，一般利用流程是中继域控NET-NTLM HASH到敏感机器，前提是目标机器不能开smb签名。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p>1.<a href="https://www.anquanke.com/post/id/194069#h3-6" target="_blank" rel="noopener">https://www.anquanke.com/post/id/194069#h3-6</a></p>
+<p>2.<a href="https://xz.aliyun.com/t/8562" target="_blank" rel="noopener">https://xz.aliyun.com/t/8562</a></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://www.urso.dog/2020/12/24/ntlm-relay/" title="NTLM认证及其利用点" target="_blank" rel="external">https://www.urso.dog/2020/12/24/ntlm-relay/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/dr1nkw4ter" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/touxiang.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/dr1nkw4ter" target="_blank"><span class="text-dark">drinkwater</span><small class="ml-1x">网络安全从业者</small></a></h3>
+        <div>此博客用来记录 学习&amp;心情</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2020/09/17/NetLogon%E7%89%B9%E6%9D%83%E6%8F%90%E5%8D%87%E6%BC%8F%E6%B4%9E-CVE-2020-1472/" title="NetLogon特权提升漏洞(CVE-2020-1472)"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+
+
+
+
+
+
+</body>
+</html>
