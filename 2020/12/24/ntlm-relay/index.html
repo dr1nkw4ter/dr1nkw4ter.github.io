@@ -45,7 +45,7 @@
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/relay.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/getpassword.png">
 <meta property="article:published_time" content="2020-12-24T09:19:09.000Z">
-<meta property="article:modified_time" content="2021-02-25T02:22:07.951Z">
+<meta property="article:modified_time" content="2021-02-25T02:26:24.032Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="中间人">
 <meta name="twitter:card" content="summary">
@@ -419,8 +419,8 @@
 </ul>
 <p>注：NTLM将自动以当前用户的账号和密码作为凭证来进行上面的操作，其认证方式有三种：</p>
 <p>1、不使用NTLM身份验证<br>2、先尝试NTLM身份验证,认证失败,再采用用户名和密码（默认方式）<br>3、仅使用NTLM身份验证</p>
-<p>###NTLM认证过程中带来的问题</p>
-<p>####PTH（hash传递）</p>
+<p>##NTLM认证过程中带来的问题</p>
+<p>###PTH（hash传递）</p>
 <p>从认证过程来看，hash与challenge进行加密运算得到response是认证关键，而这个过程并没有密码明文的存在，也就是说我们使用hash就可以模拟用户登录。适用于没有明文，仅知道hash的场景。</p>
 <p>前提条件：用户名及对应ntlm hash。</p>
 <p>mimikatz：</p>
@@ -434,7 +434,7 @@
 <p>原理：</p>
 <p>对于远程连接到Windows Vista +计算机的任何非RID 500本地管理员帐户，无论是通过WMI，PSEXEC还是其他方法(例外：RDP远程登录)，即使用户是本地管理员，返回的令牌都是已过滤的管理员令牌，即受到uac的限制。</p>
 <p>对于本地“管理员”组中的域用户帐户：当具有域用户帐户的用户远程登录Windows Vista计算机并且该用户是Administrators组的成员时，域用户将在远程计算机上以完全管理员访问令牌运行，并且该用户的UAC被禁用在该会话的远程计算机上。</p>
-<p>####NTLM RELAY</p>
+<p>###NTLM RELAY</p>
 <p>ntlm relay的过程：</p>
 <p><img src="/2020/12/24/ntlm-relay/ntlm_relay.png" alt></p>
 <p>很明显就是一个中间人攻击的过程，但要明确ntlm是一个用来的作为认证的嵌入式协议，如果ntlm的上层协议是smb的情况下,ntlmrelay就是smb relay。那如果上层协议是http，我们也可以叫做http relay，但是统称为ntlm relay。</p>

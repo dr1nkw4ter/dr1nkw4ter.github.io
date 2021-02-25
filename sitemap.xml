@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.urso.dog/about/index.html</loc>
+    
+    <lastmod>2021-02-25T02:31:25.508Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.urso.dog/2020/12/24/ntlm-relay/</loc>
     
-    <lastmod>2021-02-25T02:22:07.951Z</lastmod>
+    <lastmod>2021-02-25T02:26:24.032Z</lastmod>
     
   </url>
   
@@ -19,13 +26,6 @@
     <loc>https://www.urso.dog/2020/07/21/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F%E5%91%BD%E4%BB%A4%E9%80%9F%E6%9F%A5/</loc>
     
     <lastmod>2020-10-12T02:04:19.093Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.urso.dog/about/index.html</loc>
-    
-    <lastmod>2020-09-29T02:00:36.173Z</lastmod>
     
   </url>
   
