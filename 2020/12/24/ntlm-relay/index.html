@@ -18,12 +18,12 @@
   
   
   <title>NTLM认证及其利用点 | drinkwater&#39;s Blog</title>
-  <meta name="description" content="#NTLM认证在内网中的角色 微软采用 Kerberos 作为 Windows 2000及之后的活动目录域的默认认证协议。当某个服务器隶属于一个Windows AD域或者通过某种方式（如Linux到Windows AD的认证）与Windows  服务器域建立了信任关系的时候，通常采用Kerberos作为认证协议。但是无论你是否拥有活动目录域，NTLM都可以被采用。 拓展知识：Kerberos认证和">
+  <meta name="description" content="NTLM认证在内网中的角色微软采用 Kerberos 作为 Windows 2000及之后的活动目录域的默认认证协议。当某个服务器隶属于一个Windows AD域或者通过某种方式（如Linux到Windows AD的认证）与Windows  服务器域建立了信任关系的时候，通常采用Kerberos作为认证协议。但是无论你是否拥有活动目录域，NTLM都可以被采用。 拓展知识：Kerberos认证和NT">
 <meta property="og:type" content="article">
 <meta property="og:title" content="NTLM认证及其利用点">
 <meta property="og:url" content="https://www.urso.dog/2020/12/24/ntlm-relay/index.html">
 <meta property="og:site_name" content="dr1nkw4ter&#39;s Blog">
-<meta property="og:description" content="#NTLM认证在内网中的角色 微软采用 Kerberos 作为 Windows 2000及之后的活动目录域的默认认证协议。当某个服务器隶属于一个Windows AD域或者通过某种方式（如Linux到Windows AD的认证）与Windows  服务器域建立了信任关系的时候，通常采用Kerberos作为认证协议。但是无论你是否拥有活动目录域，NTLM都可以被采用。 拓展知识：Kerberos认证和">
+<meta property="og:description" content="NTLM认证在内网中的角色微软采用 Kerberos 作为 Windows 2000及之后的活动目录域的默认认证协议。当某个服务器隶属于一个Windows AD域或者通过某种方式（如Linux到Windows AD的认证）与Windows  服务器域建立了信任关系的时候，通常采用Kerberos作为认证协议。但是无论你是否拥有活动目录域，NTLM都可以被采用。 拓展知识：Kerberos认证和NT">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlmrenzheng.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/pth.png">
@@ -45,7 +45,7 @@
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/relay.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/getpassword.png">
 <meta property="article:published_time" content="2020-12-24T09:19:09.000Z">
-<meta property="article:modified_time" content="2021-02-25T02:47:56.567Z">
+<meta property="article:modified_time" content="2021-02-25T02:55:52.957Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="中间人">
 <meta name="twitter:card" content="summary">
@@ -335,7 +335,7 @@
   <div class="slimContent">
     <nav id="toc" class="article-toc">
       <h3 class="toc-title">文章目录</h3>
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#NTLM认证过程"><span class="toc-number">1.</span> <span class="toc-text">NTLM认证过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PTH（hash传递）"><span class="toc-number">1.0.1.</span> <span class="toc-text">PTH（hash传递）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#破解NET-NTLM-HASH"><span class="toc-number">1.0.1.1.</span> <span class="toc-text">破解NET_NTLM HASH</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考链接"><span class="toc-number">1.1.</span> <span class="toc-text">参考链接</span></a></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#NTLM认证在内网中的角色"><span class="toc-number">1.</span> <span class="toc-text">NTLM认证在内网中的角色</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#NTLM认证过程"><span class="toc-number">2.</span> <span class="toc-text">NTLM认证过程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#NTLM认证过程中带来的问题"><span class="toc-number">2.1.</span> <span class="toc-text">NTLM认证过程中带来的问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PTH（hash传递）"><span class="toc-number">2.1.1.</span> <span class="toc-text">PTH（hash传递）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NET-NTLM的利用"><span class="toc-number">2.1.2.</span> <span class="toc-text">NET_NTLM的利用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#破解NET-NTLM-HASH"><span class="toc-number">2.1.2.1.</span> <span class="toc-text">破解NET_NTLM HASH</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NTLM-RELAY"><span class="toc-number">2.1.2.2.</span> <span class="toc-text">NTLM_RELAY</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#工作组"><span class="toc-number">2.1.2.2.0.1.</span> <span class="toc-text">工作组</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#域内："><span class="toc-number">2.1.2.2.0.2.</span> <span class="toc-text">域内：</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考链接"><span class="toc-number">2.2.</span> <span class="toc-text">参考链接</span></a></li></ol></li></ol>
     </nav>
   </div>
 </aside>
@@ -396,9 +396,8 @@
     </div>
     <div class="article-entry marked-body" itemprop="articleBody">
       
-        <p>#NTLM认证在内网中的角色</p>
-<p>微软采用 Kerberos 作为 Windows 2000及之后的活动目录域的默认认证协议。当某个服务器隶属于一个Windows AD域或者通过某种方式（如Linux到Windows AD的认证）与Windows  服务器域建立了信任关系的时候，通常采用Kerberos作为认证协议。但是无论你是否拥有活动目录域，NTLM都可以被采用。</p>
-<p>拓展知识：Kerberos认证和NTLM认证都是基于<code>SSPI</code>（Security Support Provider Interface:Windows 定义的一套接口，此接口定义了与安全有关的功能函数， 用来进行身份验证、信息完整性验证、保护信息隐私等安全功能）实现的验证机制，即SSP(Security Support Provider)。NTLM SSP 是一种 Challenge/Response 验证机制。Kerberos SSP是基于 ticket 的身份验证机制。</p>
+        <h1 id="NTLM认证在内网中的角色"><a href="#NTLM认证在内网中的角色" class="headerlink" title="NTLM认证在内网中的角色"></a>NTLM认证在内网中的角色</h1><p>微软采用 Kerberos 作为 Windows 2000及之后的活动目录域的默认认证协议。当某个服务器隶属于一个Windows AD域或者通过某种方式（如Linux到Windows AD的认证）与Windows  服务器域建立了信任关系的时候，通常采用Kerberos作为认证协议。但是无论你是否拥有活动目录域，NTLM都可以被采用。</p>
+<p>拓展知识：Kerberos认证和NTLM认证都是基于<code>SSPI</code>（Security Support Provider Interface:Windows 定义的一套接口，此接口定义了与安全有关的功能函数， 用来进行身份验证、信息完整性验证、保护信息隐私等安全功能）实现的验证机制，即SSP(Security Support Provider)。NTLM SSP 是一种 Challenge/Response 验证机制。Kerberos SSP是基于 ticket 的身份验证机制。1</p>
 <h1 id="NTLM认证过程"><a href="#NTLM认证过程" class="headerlink" title="NTLM认证过程"></a>NTLM认证过程</h1><p>NTLM Hash，在LM Hash算法被弃用后，NTLM Hash被用来进行Windows本地及网络认证的凭据，长度为32bit。</p>
 <p>例：    </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">admin -&gt; hex(16进制编码) &#x3D; 61646d696e </span><br><span class="line">61646d696e -&gt; Unicode &#x3D; 610064006d0069006e00 </span><br><span class="line">610064006d0069006e00 -&gt; MD4 &#x3D; 209c6174da490caeb422f3fa5a7ae634</span><br></pre></td></tr></table></figure>
@@ -419,8 +418,7 @@
 </ul>
 <p>注：NTLM将自动以当前用户的账号和密码作为凭证来进行上面的操作，其认证方式有三种：</p>
 <p>1、不使用NTLM身份验证<br>2、先尝试NTLM身份验证,认证失败,再采用用户名和密码（默认方式）<br>3、仅使用NTLM身份验证</p>
-<p>##NTLM认证过程中带来的问题</p>
-<h3 id="PTH（hash传递）"><a href="#PTH（hash传递）" class="headerlink" title="PTH（hash传递）"></a>PTH（hash传递）</h3><p>从认证过程来看，hash与challenge进行加密运算得到response是认证关键，而这个过程并没有密码明文的存在，也就是说我们使用hash就可以模拟用户登录。适用于没有明文，仅知道hash的场景。</p>
+<h2 id="NTLM认证过程中带来的问题"><a href="#NTLM认证过程中带来的问题" class="headerlink" title="NTLM认证过程中带来的问题"></a>NTLM认证过程中带来的问题</h2><h3 id="PTH（hash传递）"><a href="#PTH（hash传递）" class="headerlink" title="PTH（hash传递）"></a>PTH（hash传递）</h3><p>从认证过程来看，hash与challenge进行加密运算得到response是认证关键，而这个过程并没有密码明文的存在，也就是说我们使用hash就可以模拟用户登录。适用于没有明文，仅知道hash的场景。</p>
 <p>前提条件：用户名及对应ntlm hash。</p>
 <p>mimikatz：</p>
 <p>目标不是域用户而是本地用户时，domain跟主机名</p>
@@ -433,8 +431,7 @@
 <p>原理：</p>
 <p>对于远程连接到Windows Vista +计算机的任何非RID 500本地管理员帐户，无论是通过WMI，PSEXEC还是其他方法(例外：RDP远程登录)，即使用户是本地管理员，返回的令牌都是已过滤的管理员令牌，即受到uac的限制。</p>
 <p>对于本地“管理员”组中的域用户帐户：当具有域用户帐户的用户远程登录Windows Vista计算机并且该用户是Administrators组的成员时，域用户将在远程计算机上以完全管理员访问令牌运行，并且该用户的UAC被禁用在该会话的远程计算机上。</p>
-<p>###NET_NTLM的利用</p>
-<h4 id="破解NET-NTLM-HASH"><a href="#破解NET-NTLM-HASH" class="headerlink" title="破解NET_NTLM HASH"></a>破解NET_NTLM HASH</h4><p>相关协议：LLMNR、NBNS、MDNS</p>
+<h3 id="NET-NTLM的利用"><a href="#NET-NTLM的利用" class="headerlink" title="NET_NTLM的利用"></a>NET_NTLM的利用</h3><h4 id="破解NET-NTLM-HASH"><a href="#破解NET-NTLM-HASH" class="headerlink" title="破解NET_NTLM HASH"></a>破解NET_NTLM HASH</h4><p>相关协议：LLMNR、NBNS、MDNS</p>
 <p>攻击机：192.168.31.1</p>
 <p>受害机：192.168.31.144</p>
 <p>使用responder建立监听，指定网卡</p>
@@ -470,8 +467,7 @@
 <p>此时发生了尴尬的一幕：</p>
 <p><img src="/2020/12/24/ntlm-relay/crack.png" alt></p>
 <p>刚开始以为是我密码强度太高，但更换密码之后依旧如此，使用别人之前成功解密的v1hash也不能再次解密成功….(站点问题？)</p>
-<p>####NTLM_RELAY</p>
-<p>ntlm relay的过程：</p>
+<h4 id="NTLM-RELAY"><a href="#NTLM-RELAY" class="headerlink" title="NTLM_RELAY"></a>NTLM_RELAY</h4><p>ntlm relay的过程：</p>
 <p><img src="/2020/12/24/ntlm-relay/ntlm_relay.png" alt></p>
 <p>很明显就是一个中间人攻击的过程，但要明确ntlm是一个用来的作为认证的嵌入式协议，如果ntlm的上层协议是smb的情况下,ntlmrelay就是smb relay。那如果上层协议是http，我们也可以叫做http relay，但是统称为ntlm relay。</p>
 <p>如何在内网中触发ntlm请求：</p>
@@ -480,10 +476,8 @@
 <p>使用responder配套工具RunFinger检测是否开启smb签名：</p>
 <p><img src="/2020/12/24/ntlm-relay/smbsign.png" alt></p>
 <p>发现192.168.31.144未开启smb签名。</p>
-<p>######工作组</p>
-<p>在工作组当中只能够中继sid 500 administrator账户，成功的条件是被欺骗机器的administrator密码和被攻击主机的administrator密码相同！</p>
-<p>######域内：</p>
-<p>攻击机：192.168.31.1</p>
+<h6 id="工作组"><a href="#工作组" class="headerlink" title="工作组"></a>工作组</h6><p>在工作组当中只能够中继sid 500 administrator账户，成功的条件是被欺骗机器的administrator密码和被攻击主机的administrator密码相同！</p>
+<h6 id="域内："><a href="#域内：" class="headerlink" title="域内："></a>域内：</h6><p>攻击机：192.168.31.1</p>
 <p>受害者机器：192.168.31.144</p>
 <p>域控：192.168.31.150</p>
 <p>首先关掉responder的SMB和HTTP服务器，否则端口占用会和Multi-relay之间产生一些冲突。修改</p>
