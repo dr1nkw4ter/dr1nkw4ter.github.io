@@ -28,7 +28,6 @@
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlmrenzheng.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/pth.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/pth1.png">
-<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlm_relay.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/responder.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/netuse.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/gethash.png">
@@ -38,6 +37,7 @@
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlmv12.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/jiemiv1.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/crack.png">
+<meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlm_relay.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/smbsign.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/xiugaiconfig.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/ntlm-relay/offsmbhttp.png">
@@ -45,7 +45,7 @@
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/relay.png">
 <meta property="og:image" content="https://www.urso.dog/2020/12/24/ntlm-relay/getpassword.png">
 <meta property="article:published_time" content="2020-12-24T09:19:09.000Z">
-<meta property="article:modified_time" content="2021-02-25T02:26:24.032Z">
+<meta property="article:modified_time" content="2021-02-25T02:45:02.280Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="中间人">
 <meta name="twitter:card" content="summary">
@@ -335,7 +335,7 @@
   <div class="slimContent">
     <nav id="toc" class="article-toc">
       <h3 class="toc-title">文章目录</h3>
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#NTLM认证过程"><span class="toc-number">1.</span> <span class="toc-text">NTLM认证过程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#破解net-ntlm-hash"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">破解net_ntlm hash</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考链接"><span class="toc-number">2.</span> <span class="toc-text">参考链接</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#NTLM认证过程"><span class="toc-number">1.</span> <span class="toc-text">NTLM认证过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#PTH（hash传递）"><span class="toc-number">1.1.</span> <span class="toc-text">PTH（hash传递）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#破解NET-NTLM-HASH"><span class="toc-number">1.1.1.</span> <span class="toc-text">破解NET_NTLM HASH</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考链接"><span class="toc-number">2.</span> <span class="toc-text">参考链接</span></a></li></ol>
     </nav>
   </div>
 </aside>
@@ -420,8 +420,7 @@
 <p>注：NTLM将自动以当前用户的账号和密码作为凭证来进行上面的操作，其认证方式有三种：</p>
 <p>1、不使用NTLM身份验证<br>2、先尝试NTLM身份验证,认证失败,再采用用户名和密码（默认方式）<br>3、仅使用NTLM身份验证</p>
 <p>##NTLM认证过程中带来的问题</p>
-<p>###PTH（hash传递）</p>
-<p>从认证过程来看，hash与challenge进行加密运算得到response是认证关键，而这个过程并没有密码明文的存在，也就是说我们使用hash就可以模拟用户登录。适用于没有明文，仅知道hash的场景。</p>
+<h3 id="PTH（hash传递）"><a href="#PTH（hash传递）" class="headerlink" title="PTH（hash传递）"></a>PTH（hash传递）</h3><p>从认证过程来看，hash与challenge进行加密运算得到response是认证关键，而这个过程并没有密码明文的存在，也就是说我们使用hash就可以模拟用户登录。适用于没有明文，仅知道hash的场景。</p>
 <p>前提条件：用户名及对应ntlm hash。</p>
 <p>mimikatz：</p>
 <p>目标不是域用户而是本地用户时，domain跟主机名</p>
@@ -434,14 +433,8 @@
 <p>原理：</p>
 <p>对于远程连接到Windows Vista +计算机的任何非RID 500本地管理员帐户，无论是通过WMI，PSEXEC还是其他方法(例外：RDP远程登录)，即使用户是本地管理员，返回的令牌都是已过滤的管理员令牌，即受到uac的限制。</p>
 <p>对于本地“管理员”组中的域用户帐户：当具有域用户帐户的用户远程登录Windows Vista计算机并且该用户是Administrators组的成员时，域用户将在远程计算机上以完全管理员访问令牌运行，并且该用户的UAC被禁用在该会话的远程计算机上。</p>
-<p>###NTLM RELAY</p>
-<p>ntlm relay的过程：</p>
-<p><img src="/2020/12/24/ntlm-relay/ntlm_relay.png" alt></p>
-<p>很明显就是一个中间人攻击的过程，但要明确ntlm是一个用来的作为认证的嵌入式协议，如果ntlm的上层协议是smb的情况下,ntlmrelay就是smb relay。那如果上层协议是http，我们也可以叫做http relay，但是统称为ntlm relay。</p>
-<p>如何在内网中触发ntlm请求：</p>
-<p>此篇文章已有详细的介绍：<a href="https://www.anquanke.com/post/id/193493#h2-6" target="_blank" rel="noopener">https://www.anquanke.com/post/id/193493#h2-6</a></p>
-<p>####NET_NTLM的利用</p>
-<h5 id="破解net-ntlm-hash"><a href="#破解net-ntlm-hash" class="headerlink" title="破解net_ntlm hash"></a>破解net_ntlm hash</h5><p>相关协议：LLMNR、NBNS、MDNS</p>
+<p>###NET_NTLM的利用</p>
+<h4 id="破解NET-NTLM-HASH"><a href="#破解NET-NTLM-HASH" class="headerlink" title="破解NET_NTLM HASH"></a>破解NET_NTLM HASH</h4><p>相关协议：LLMNR、NBNS、MDNS</p>
 <p>攻击机：192.168.31.1</p>
 <p>受害机：192.168.31.144</p>
 <p>使用responder建立监听，指定网卡</p>
@@ -477,7 +470,12 @@
 <p>此时发生了尴尬的一幕：</p>
 <p><img src="/2020/12/24/ntlm-relay/crack.png" alt></p>
 <p>刚开始以为是我密码强度太高，但更换密码之后依旧如此，使用别人之前成功解密的v1hash也不能再次解密成功….(站点问题？)</p>
-<p>#####NTLM_RELAY</p>
+<p>####NTLM_RELAY</p>
+<p>ntlm relay的过程：</p>
+<p><img src="/2020/12/24/ntlm-relay/ntlm_relay.png" alt></p>
+<p>很明显就是一个中间人攻击的过程，但要明确ntlm是一个用来的作为认证的嵌入式协议，如果ntlm的上层协议是smb的情况下,ntlmrelay就是smb relay。那如果上层协议是http，我们也可以叫做http relay，但是统称为ntlm relay。</p>
+<p>如何在内网中触发ntlm请求：</p>
+<p>此篇文章已有详细的介绍：<a href="https://www.anquanke.com/post/id/193493#h2-6" target="_blank" rel="noopener">https://www.anquanke.com/post/id/193493#h2-6</a></p>
 <p>当字典不够强大时，可以考虑不进行破解，转而进行中继。以smbrelay为例：被攻击机器不能开启SMB签名。默认不开启，但是在域中域控是默认开启的。所以在域中通常就是中继管理组成员到一些敏感的机器上。</p>
 <p>使用responder配套工具RunFinger检测是否开启smb签名：</p>
 <p><img src="/2020/12/24/ntlm-relay/smbsign.png" alt></p>
